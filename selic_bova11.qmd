@@ -248,22 +248,16 @@ diferenca_atual <- bova_atual - selic_atual
 campo_yahoo <- attr(bova_raw, "campo_yahoo")
 ```
 
-## Row {height="20%"}
+## Row {height="15%"}
 
 ```{r}
 #| content: valuebox
+#| title: "SELIC acumulada"
 
 list(
-  title = paste0(
-    "Último dado · ",
-    format(data_comparacao, "%d/%m/%Y")
-  ),
-  icon = "calendar3",
+  icon = "bank",
   color = "primary",
-  value = paste0(
-    "SELIC ", fmt_pct(selic_atual),
-    " · BOVA11 ", fmt_pct(bova_atual)
-  )
+  value = fmt_pct(selic_atual)
 )
 ```
 
