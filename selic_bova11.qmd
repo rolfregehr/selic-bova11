@@ -252,12 +252,18 @@ campo_yahoo <- attr(bova_raw, "campo_yahoo")
 
 ```{r}
 #| content: valuebox
-#| title: "SELIC acumulada"
 
 list(
-  icon = "bank",
+  title = paste0(
+    "Último dado · ",
+    format(data_comparacao, "%d/%m/%Y")
+  ),
+  icon = "calendar3",
   color = "primary",
-  value = fmt_pct(selic_atual)
+  value = paste0(
+    "SELIC ", fmt_pct(selic_atual),
+    " · BOVA11 ", fmt_pct(bova_atual)
+  )
 )
 ```
 
