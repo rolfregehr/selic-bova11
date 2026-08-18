@@ -36,6 +36,7 @@ body.quarto-dashboard {
   min-width: 0;
   min-height: 0;
   margin: 0;
+  overflow: hidden;
 }
 
 .quarto-dashboard-content .card-header {
@@ -71,7 +72,16 @@ body.quarto-dashboard {
 .value-box-grid[data-icon="calendar3"] .value-box-value {
   font-size: clamp(0.72rem, 1.35vw, 1.05rem);
   line-height: 1.15;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.value-box-grid[data-icon="calendar3"] .value-box-area {
+  min-width: 0;
+}
+
+.card[data-title="Rendimento acumulado"] .plotly.html-widget {
+  max-height: 100% !important;
 }
 
 /* O texto gerado por cat() chega ao HTML como <pre>; permitimos quebra de
