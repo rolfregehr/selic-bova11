@@ -1,0 +1,436 @@
+---
+title: "SELIC vs BOVA11"
+subtitle: "Rendimento acumulado desde o primeiro dia comum de negociação de 2024"
+format:
+  dashboard:
+    theme: cosmo
+    css: styles.css
+    orientation: rows
+    scrolling: false
+execute:
+  echo: false
+  warning: false
+  message: false
+  cache: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+pacotes <- c(
+  "jsonlite", "dplyr", "tibble", "lubridate",
+  "quantmod", "zoo", "plotly", "scales"
+)
+
+faltantes <- pacotes[!vapply(pacotes, requireNamespace, logical(1), quietly = TRUE)]
+
+if (length(faltantes) > 0) {
+  stop(
+    "Instale os pacotes faltantes antes de renderizar: ",
+    paste(faltantes, collapse = ", "),
+    call. = FALSE
+  )
+}
+
+options(timeout = 60)
+
+data_inicial <- as.Date("2024-01-01")
+data_final   <- Sys.Date()
+ticker_bova  <- "BOVA11.SA"
+
+fmt_pct <- function(x, accuracy = 0.01) {
+  scales::percent(
+    x / 100,
+    accuracy = accuracy,
+    decimal.mark = ",",
+    big.mark = "."
+  )
+}
+```
+
+```{r}
+#| label: funcoes
+#| include: false
+
+coletar_selic <- function(data_inicial, data_final, tentativas = 3) {
+
+  url_bcb <- paste0(
+    "https://api.bcb.gov.br/dados/serie/bcdata.sgs.11/dados",
+    "?formato=json",
+    "&dataInicial=", utils::URLencode(format(data_inicial, "%d/%m/%Y"), reserved = TRUE),
+    "&dataFinal=", utils::URLencode(format(data_final, "%d/%m/%Y"), reserved = TRUE)
+  )
+
+  dados <- NULL
+  ultimo_erro <- NULL
+
+  for (i in seq_len(tentativas)) {
+    dados <- tryCatch(
+      jsonlite::fromJSON(url_bcb),
+      error = function(e) {
+        ultimo_erro <<- conditionMessage(e)
+        NULL
+      }
+    )
+
+    if (!is.null(dados) && nrow(dados) > 0) break
+
+    if (i < tentativas) Sys.sleep(1)
+  }
+
+  if (is.null(dados) || nrow(dados) == 0) {
+    stop(
+      "A API do Banco Central não retornou dados para a SELIC.",
+      if (!is.null(ultimo_erro)) paste0(" Erro: ", ultimo_erro) else "",
+      call. = FALSE
+    )
+  }
+
+  tibble::tibble(
+    data = lubridate::dmy(dados$data),
+    taxa_dia = as.numeric(gsub(",", ".", dados$valor, fixed = TRUE))
+  ) |>
+    dplyr::filter(!is.na(data), !is.na(taxa_dia)) |>
+    dplyr::arrange(data) |>
+    dplyr::mutate(
+      # A série SGS 11 é divulgada em percentual ao dia.
+      indice_selic = cumprod(1 + taxa_dia / 100)
+    )
+}
+
+
+coletar_bova11 <- function(data_inicial, data_final, ticker = "BOVA11.SA") {
+
+  x <- tryCatch(
+    quantmod::getSymbols(
+      Symbols = ticker,
+      src = "yahoo",
+      from = data_inicial,
+      # O argumento "to" do Yahoo/quantmod pode ser exclusivo.
+      to = data_final + 1,
+      auto.assign = FALSE,
+      warnings = FALSE
+    ),
+    error = function(e) {
+      stop(
+        "Falha ao coletar ", ticker, " no Yahoo Finance: ",
+        conditionMessage(e),
+        call. = FALSE
+      )
+    }
+  )
+
+  preco <- tryCatch(
+    quantmod::Ad(x),
+    error = function(e) NULL
+  )
+
+  fonte_preco <- "Adjusted"
+
+  if (is.null(preco) || all(is.na(preco))) {
+    preco <- quantmod::Cl(x)
+    fonte_preco <- "Close"
+  }
+
+  out <- tibble::tibble(
+    data = as.Date(zoo::index(x)),
+    preco = as.numeric(preco)
+  ) |>
+    dplyr::filter(!is.na(data), !is.na(preco)) |>
+    dplyr::arrange(data)
+
+  attr(out, "campo_yahoo") <- fonte_preco
+  out
+}
+```
+
+```{r}
+#| label: coleta-e-calculo
+#| include: false
+
+selic_raw <- coletar_selic(data_inicial, data_final)
+bova_raw  <- coletar_bova11(data_inicial, data_final, ticker_bova)
+
+# Checagens explícitas: se a coleta falhar ou voltar vazia, o dashboard
+# para aqui em vez de desenhar um painel sem linhas.
+if (nrow(selic_raw) < 2) {
+  stop("A série da SELIC retornou menos de duas observações.", call. = FALSE)
+}
+
+if (nrow(bova_raw) < 2) {
+  stop("A série do BOVA11 retornou menos de duas observações.", call. = FALSE)
+}
+
+# Usamos datas em texto no intersect para evitar perda de classe Date
+# em versões diferentes do R.
+datas_comuns <- intersect(
+  as.character(selic_raw$data),
+  as.character(bova_raw$data)
+)
+
+if (length(datas_comuns) == 0) {
+  stop(
+    "Não foi encontrada nenhuma data comum entre SELIC e BOVA11.",
+    call. = FALSE
+  )
+}
+
+# Primeira e última datas comuns.
+data_base       <- as.Date(min(datas_comuns))
+data_comparacao <- as.Date(max(datas_comuns))
+
+# SELIC:
+# primeiro acumulamos TODAS as taxas diárias do BCB.
+# Só depois fazemos o rebase para 0% na data-base.
+indice_base_selic <- selic_raw |>
+  dplyr::filter(data == data_base) |>
+  dplyr::pull(indice_selic) |>
+  dplyr::first()
+
+selic <- selic_raw |>
+  dplyr::filter(data >= data_base) |>
+  dplyr::mutate(
+    rendimento = 100 * (indice_selic / indice_base_selic - 1),
+    serie = "SELIC"
+  ) |>
+  dplyr::select(data, serie, rendimento)
+
+# BOVA11:
+preco_base_bova <- bova_raw |>
+  dplyr::filter(data == data_base) |>
+  dplyr::pull(preco) |>
+  dplyr::first()
+
+bova <- bova_raw |>
+  dplyr::filter(data >= data_base) |>
+  dplyr::mutate(
+    rendimento = 100 * (preco / preco_base_bova - 1),
+    serie = "BOVA11"
+  ) |>
+  dplyr::select(data, serie, rendimento)
+
+comparacao <- dplyr::bind_rows(selic, bova) |>
+  dplyr::arrange(data, serie) |>
+  dplyr::mutate(
+    tooltip = paste0(
+      "<b>", serie, "</b>",
+      "<br>Data: ", format(data, "%d/%m/%Y"),
+      "<br>Acumulado: ", fmt_pct(rendimento)
+    )
+  )
+
+# Valida os números que serão efetivamente enviados ao Plotly.
+if (
+  nrow(comparacao) < 4 ||
+  !any(comparacao$serie == "SELIC") ||
+  !any(comparacao$serie == "BOVA11") ||
+  !all(is.finite(comparacao$rendimento))
+) {
+  stop(
+    "Os dados foram coletados, mas a série de rendimento contém valores inválidos.",
+    call. = FALSE
+  )
+}
+
+selic_atual <- selic |>
+  dplyr::filter(data == data_comparacao) |>
+  dplyr::pull(rendimento) |>
+  dplyr::first()
+
+bova_atual <- bova |>
+  dplyr::filter(data == data_comparacao) |>
+  dplyr::pull(rendimento) |>
+  dplyr::first()
+
+diferenca_atual <- bova_atual - selic_atual
+
+campo_yahoo <- attr(bova_raw, "campo_yahoo")
+```
+
+## Row {height="15%"}
+
+```{r}
+#| content: valuebox
+#| title: "SELIC acumulada"
+
+list(
+  icon = "bank",
+  color = "primary",
+  value = fmt_pct(selic_atual)
+)
+```
+
+```{r}
+#| content: valuebox
+#| title: "BOVA11 acumulado"
+
+list(
+  icon = "graph-up-arrow",
+  color = if (bova_atual >= 0) "success" else "danger",
+  value = fmt_pct(bova_atual)
+)
+```
+
+```{r}
+#| content: valuebox
+#| title: "BOVA11 menos SELIC"
+
+list(
+  icon = "activity",
+  color = if (diferenca_atual >= 0) "success" else "warning",
+  value = paste0(
+    if (diferenca_atual > 0) "+" else "",
+    fmt_pct(diferenca_atual)
+  )
+)
+```
+
+## Row {height="65%"}
+
+```{r}
+#| title: "Rendimento acumulado"
+#| fill: true
+
+selic_plot <- selic |>
+  dplyr::filter(is.finite(rendimento)) |>
+  dplyr::mutate(
+    selic_mais_15  = rendimento * 1.15,
+    selic_menos_15 = rendimento * 0.85
+  )
+
+bova_plot <- bova |>
+  dplyr::filter(is.finite(rendimento))
+fig <- plotly::plot_ly()
+
+fig <- fig |>
+  
+  # SELIC + 15%
+  plotly::add_lines(
+    data = selic_plot,
+    x = ~data,
+    y = ~selic_mais_15,
+    name = "SELIC +15%",
+    line = list(
+      width = 1,
+      dash = "dot"
+    ),
+    hovertemplate = paste(
+      "<b>SELIC +15%</b>",
+      "<br>Data: %{x|%d/%m/%Y}",
+      "<br>Acumulado: %{y:.2f}%",
+      "<extra></extra>"
+    )
+  ) |>
+  
+  # SELIC
+  plotly::add_lines(
+    data = selic_plot,
+    x = ~data,
+    y = ~rendimento,
+    name = "SELIC",
+    line = list(
+      width = 2
+    ),
+    hovertemplate = paste(
+      "<b>SELIC</b>",
+      "<br>Data: %{x|%d/%m/%Y}",
+      "<br>Acumulado: %{y:.2f}%",
+      "<extra></extra>"
+    )
+  ) |>
+  
+  # SELIC - 15%
+  plotly::add_lines(
+    data = selic_plot,
+    x = ~data,
+    y = ~selic_menos_15,
+    name = "SELIC -15%",
+    line = list(
+      width = 1,
+      dash = "dot"
+    ),
+    hovertemplate = paste(
+      "<b>SELIC -15%</b>",
+      "<br>Data: %{x|%d/%m/%Y}",
+      "<br>Acumulado: %{y:.2f}%",
+      "<extra></extra>"
+    )
+  ) |>
+  
+  # BOVA11
+  plotly::add_lines(
+    data = bova_plot,
+    x = ~data,
+    y = ~rendimento,
+    name = "BOVA11",
+    line = list(
+      width = 2
+    ),
+    hovertemplate = paste(
+      "<b>BOVA11</b>",
+      "<br>Data: %{x|%d/%m/%Y}",
+      "<br>Acumulado: %{y:.2f}%",
+      "<extra></extra>"
+    )
+  ) |>
+  
+  plotly::layout(
+    xaxis = list(
+      title = "",
+      type = "date",
+      tickformat = "%b<br>%Y",
+      showgrid = TRUE
+    ),
+    yaxis = list(
+      title = "Rendimento acumulado (%)",
+      ticksuffix = "%",
+      showgrid = TRUE,
+      zeroline = TRUE
+    ),
+    legend = list(
+      orientation = "h",
+      x = 0,
+      y = 1.08
+    ),
+    hovermode = "x",
+    margin = list(
+      l = 70,
+      r = 20,
+      b = 60,
+      t = 25
+    )
+  ) |>
+  
+  plotly::config(
+    displaylogo = FALSE,
+    responsive = TRUE
+  )
+
+fig
+```
+
+## Row {height="15%"}
+
+```{r}
+#| title: "Metodologia e fontes"
+
+cat(
+  paste0(
+    "**Período:** ", format(data_base, "%d/%m/%Y"),
+    " até ", format(data_comparacao, "%d/%m/%Y"), ".  \n",
+    "**SELIC:** Banco Central do Brasil, SGS série 11 (% ao dia); ",
+    "capitalização composta diária.  \n",
+    "**BOVA11:** Yahoo Finance, ticker `BOVA11.SA`, campo `",
+    campo_yahoo,
+    "`; retorno calculado pela variação do preço em relação à data-base.  \n",
+    "**Observações carregadas:** SELIC = ", nrow(selic_plot),
+    " | BOVA11 = ", nrow(bova_plot), ".  \n",
+    "**Atualização:** os dados são coletados novamente sempre que este ",
+    "arquivo Quarto é renderizado.  \n",
+    "**Última renderização:** ",
+    format(Sys.time(), "%d/%m/%Y %H:%M:%S"),
+    "."
+  )
+)
+```

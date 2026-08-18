@@ -1,0 +1,109 @@
+/* Mantem o dashboard inteiro dentro da viewport em monitores e notebooks. */
+html,
+body.quarto-dashboard {
+  height: 100%;
+  overflow: hidden;
+}
+
+#quarto-dashboard-header .navbar {
+  min-height: 0;
+  padding-block: 0.3rem;
+}
+
+#quarto-dashboard-header .navbar-title-text {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  line-height: 1.15;
+}
+
+#quarto-dashboard-header .navbar-subtitle {
+  font-size: clamp(0.68rem, 1vw, 0.85rem);
+  line-height: 1.15;
+}
+
+.quarto-dashboard-content {
+  min-height: 0;
+  padding: 0.5rem !important;
+  gap: 0.5rem !important;
+}
+
+.quarto-dashboard-content .bslib-grid {
+  min-width: 0;
+  min-height: 0;
+  gap: 0.5rem !important;
+}
+
+.quarto-dashboard-content .card {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+}
+
+.quarto-dashboard-content .card-header {
+  min-height: 0;
+  padding: 0.3rem 0.65rem;
+  line-height: 1.2;
+}
+
+.quarto-dashboard-content .card-body {
+  min-width: 0;
+  min-height: 0;
+}
+
+.valuebox .card-body {
+  padding: clamp(0.35rem, 1vh, 0.75rem);
+}
+
+.valuebox .value-box-title {
+  margin-bottom: 0.15rem;
+  font-size: clamp(0.72rem, 1.15vw, 1rem);
+  line-height: 1.1;
+}
+
+.valuebox .value-box-value {
+  font-size: clamp(1.25rem, 3vw, 2.5rem);
+  line-height: 1;
+}
+
+.valuebox .value-box-showcase {
+  font-size: clamp(1.5rem, 3.2vw, 3rem);
+}
+
+/* O texto gerado por cat() chega ao HTML como <pre>; permitimos quebra de
+   linha e reduzimos os espacos para ele nao aumentar a pagina. */
+.card[data-title="Metodologia e fontes"] .card-body {
+  padding: 0.3rem 0.65rem;
+  overflow: hidden;
+}
+
+.card[data-title="Metodologia e fontes"] pre {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: inherit;
+  font-size: clamp(0.6rem, 1.25vh, 0.78rem);
+  line-height: 1.18;
+}
+
+.card[data-title="Metodologia e fontes"] pre code {
+  font: inherit;
+  color: inherit;
+  white-space: inherit;
+}
+
+/* Em telas realmente estreitas, preservar a legibilidade e voltar a rolar. */
+@media (max-width: 700px), (max-height: 600px) {
+  html,
+  body.quarto-dashboard {
+    height: auto;
+    min-height: 100%;
+    overflow: auto;
+  }
+
+  .quarto-dashboard-content {
+    overflow: auto !important;
+  }
+}
