@@ -68,6 +68,12 @@ body.quarto-dashboard {
   font-size: clamp(1.5rem, 3.2vw, 3rem);
 }
 
+.value-box-grid[data-icon="calendar3"] .value-box-value {
+  font-size: clamp(0.72rem, 1.35vw, 1.05rem);
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
 /* O texto gerado por cat() chega ao HTML como <pre>; permitimos quebra de
    linha e reduzimos os espacos para ele nao aumentar a pagina. */
 .card[data-title="Metodologia e fontes"] .card-body {
