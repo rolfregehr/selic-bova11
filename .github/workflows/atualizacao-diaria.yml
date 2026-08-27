@@ -1,8 +1,10 @@
-name: Atualizacao diaria do dashboard
+name: Atualizacao intradiaria do dashboard
 
 on:
   schedule:
-    - cron: "0 15 * * *"
+    - cron: "*/15 10-18 * * 1-5"
+      timezone: "America/Sao_Paulo"
+    - cron: "0 19 * * 1-5"
       timezone: "America/Sao_Paulo"
   workflow_dispatch:
 
