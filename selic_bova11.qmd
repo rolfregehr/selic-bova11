@@ -434,13 +434,12 @@ fig <- fig |>
         borderpad = 8,
         font = list(size = 12, color = "#212529"),
         text = paste0(
-          "<b>BOVA11</b>",
-          "<br>Mais recente · ", format(data_preco_bova_atual, "%d/%m/%Y"),
-          ": <b>", fmt_brl(preco_bova_atual), "</b>",
-          "<br>SELIC −15% · ", format(data_comparacao, "%d/%m/%Y"),
-          ": <b>", fmt_brl(preco_bova_selic_menos_15), "</b>",
-          "<br>SELIC +15% · ", format(data_comparacao, "%d/%m/%Y"),
-          ": <b>", fmt_brl(preco_bova_selic_mais_15), "</b>"
+          "<b>BOVA11 · ", format(data_preco_bova_atual, "%d/%m/%Y"), "</b>",
+          "<br>Mais recente: <b>", fmt_brl(preco_bova_atual), "</b>",
+          "<br>Cruzamento SELIC −15%: <b>",
+          fmt_brl(preco_bova_selic_menos_15), "</b>",
+          "<br>Cruzamento SELIC +15%: <b>",
+          fmt_brl(preco_bova_selic_mais_15), "</b>"
         )
       )
     ),
