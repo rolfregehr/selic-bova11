@@ -268,6 +268,18 @@ preco_bova_selic_menos_15 <- preco_base_bova *
 preco_bova_selic_mais_15 <- preco_base_bova *
   (1 + (selic_atual * 1.15) / 100)
 
+sinal_compra <- if (preco_bova_atual < preco_bova_selic_menos_15) {
+  " · <b style='color:#198754'>COMPRA</b>"
+} else {
+  ""
+}
+
+sinal_venda <- if (preco_bova_atual > preco_bova_selic_mais_15) {
+  " · <b style='color:#dc3545'>VENDA</b>"
+} else {
+  ""
+}
+
 diferenca_atual <- bova_atual - selic_atual
 
 campo_yahoo <- attr(bova_raw, "campo_yahoo")
@@ -437,9 +449,9 @@ fig <- fig |>
           "<b>BOVA11 · ", format(data_preco_bova_atual, "%d/%m/%Y"), "</b>",
           "<br>Mais recente: <b>", fmt_brl(preco_bova_atual), "</b>",
           "<br>Cruzamento SELIC −15%: <b>",
-          fmt_brl(preco_bova_selic_menos_15), "</b>",
+          fmt_brl(preco_bova_selic_menos_15), "</b>", sinal_compra,
           "<br>Cruzamento SELIC +15%: <b>",
-          fmt_brl(preco_bova_selic_mais_15), "</b>"
+          fmt_brl(preco_bova_selic_mais_15), "</b>", sinal_venda
         )
       )
     ),
