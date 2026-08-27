@@ -47,6 +47,19 @@ fmt_pct <- function(x, accuracy = 0.01) {
     big.mark = "."
   )
 }
+
+fmt_brl <- function(x) {
+  paste0(
+    "R$ ",
+    formatC(
+      x,
+      format = "f",
+      digits = 2,
+      decimal.mark = ",",
+      big.mark = "."
+    )
+  )
+}
 ```
 
 ```{r}
@@ -243,6 +256,18 @@ bova_atual <- bova |>
   dplyr::pull(rendimento) |>
   dplyr::first()
 
+ultimo_bova <- bova_raw |>
+  dplyr::slice_tail(n = 1)
+
+data_preco_bova_atual <- ultimo_bova$data[[1]]
+preco_bova_atual      <- ultimo_bova$preco[[1]]
+
+preco_bova_selic_menos_15 <- preco_base_bova *
+  (1 + (selic_atual * 0.85) / 100)
+
+preco_bova_selic_mais_15 <- preco_base_bova *
+  (1 + (selic_atual * 1.15) / 100)
+
 diferenca_atual <- bova_atual - selic_atual
 
 campo_yahoo <- attr(bova_raw, "campo_yahoo")
@@ -392,6 +417,32 @@ fig <- fig |>
       orientation = "h",
       x = 0,
       y = 1.08
+    ),
+    annotations = list(
+      list(
+        xref = "paper",
+        yref = "paper",
+        x = 0.015,
+        y = 0.98,
+        xanchor = "left",
+        yanchor = "top",
+        align = "left",
+        showarrow = FALSE,
+        bgcolor = "rgba(255, 255, 255, 0.94)",
+        bordercolor = "rgba(33, 37, 41, 0.28)",
+        borderwidth = 1,
+        borderpad = 8,
+        font = list(size = 12, color = "#212529"),
+        text = paste0(
+          "<b>BOVA11</b>",
+          "<br>Mais recente · ", format(data_preco_bova_atual, "%d/%m/%Y"),
+          ": <b>", fmt_brl(preco_bova_atual), "</b>",
+          "<br>SELIC −15% · ", format(data_comparacao, "%d/%m/%Y"),
+          ": <b>", fmt_brl(preco_bova_selic_menos_15), "</b>",
+          "<br>SELIC +15% · ", format(data_comparacao, "%d/%m/%Y"),
+          ": <b>", fmt_brl(preco_bova_selic_mais_15), "</b>"
+        )
+      )
     ),
     hovermode = "x",
     margin = list(
