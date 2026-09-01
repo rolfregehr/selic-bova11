@@ -7,6 +7,7 @@ format:
     css: styles.css
     orientation: rows
     scrolling: false
+output-file: index.html
 execute:
   echo: false
   warning: false

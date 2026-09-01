@@ -7,3 +7,7 @@
 /selic_bova11.html
 /selic_bova11.knit.md
 /selic_bova11_files/
+/index.html
+/index_files/
+
+**/*.quarto_ipynb

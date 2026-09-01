@@ -1,0 +1,16 @@
+[Unit]
+Description=Renderiza e publica o dashboard SELIC vs BOVA11
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=deploy
+Group=deploy
+WorkingDirectory=/home/deploy/apps/selic-bova11
+Environment=TZ=America/Sao_Paulo
+ExecStart=/home/deploy/apps/selic-bova11/deploy/render-and-publish.sh
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

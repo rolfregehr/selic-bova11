@@ -1,0 +1,10 @@
+[Unit]
+Description=Atualiza o dashboard SELIC vs BOVA11 de hora em hora
+
+[Timer]
+OnCalendar=Mon..Fri *-*-* 10..19:00:00 America/Sao_Paulo
+Persistent=true
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target
