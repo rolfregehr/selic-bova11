@@ -1,0 +1,21 @@
+[Unit]
+Description=App Shiny da carteira de investimentos
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/home/deploy/apps/selic-bova11
+Environment=TZ=America/Sao_Paulo
+Environment=CARTEIRA_DATA_DIR=/home/deploy/data/carteira
+Environment=R_LIBS_USER=/home/deploy/R/carteira-library
+ExecStart=/usr/bin/Rscript -e "shiny::runApp('.', host='127.0.0.1', port=3838, launch.browser=FALSE)"
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

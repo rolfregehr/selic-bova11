@@ -27,6 +27,7 @@ rsync_excludes=(
   --exclude=/.Rproj.user/
   --exclude=/.quarto/
   --exclude=/deploy/
+  --exclude=/data/
   --exclude=/.Rhistory
   --exclude=/.RData
   --exclude=/.Ruserdata
@@ -53,9 +54,15 @@ publicar() {
     "$project_dir/" \
     "$vps_target:$remote_dir/"
 
-  echo "Renderizando e publicando no VPS..."
+  echo "Reiniciando o app Shiny no VPS..."
   ssh -p "$vps_port" "$vps_target" \
-    "sudo systemctl start selic-bova11.service && test \"\$(sudo systemctl show selic-bova11.service -p Result --value)\" = success"
+    "sudo systemctl restart carteira-shiny.service && sudo systemctl is-active --quiet carteira-shiny.service"
+
+  echo "Atualizando também o dashboard estático..."
+  if ! ssh -p "$vps_port" "$vps_target" \
+    "sudo systemctl start selic-bova11.service && test \"\$(sudo systemctl show selic-bova11.service -p Result --value)\" = success"; then
+    echo "Aviso: o app Shiny foi publicado, mas a atualização do dashboard estático falhou." >&2
+  fi
 
   curl --fail --silent --show-error --head "$site_url" >/dev/null
 
@@ -72,6 +79,7 @@ fingerprint() {
     -path "$project_dir/.Rproj.user" -prune -o \
     -path "$project_dir/.quarto" -prune -o \
     -path "$project_dir/deploy" -prune -o \
+    -path "$project_dir/data" -prune -o \
     -path "$project_dir/_site" -prune -o \
     -name '.Rhistory' -prune -o \
     -name '.RData' -prune -o \

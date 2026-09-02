@@ -1,0 +1,341 @@
+body {
+  background: #f6f8f7;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.navbar-brand {
+  font-weight: 700;
+}
+
+.sidebar .nav-pills {
+  margin-bottom: 1rem;
+}
+
+.help-copy {
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.compact-sidebar {
+  font-size: 0.84rem;
+}
+
+.compact-sidebar h4 {
+  margin: 0 0 0.1rem;
+  font-size: 1.08rem;
+  line-height: 1.1;
+}
+
+.compact-sidebar h5 {
+  margin: 0.12rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.05;
+}
+
+.compact-sidebar .asset-operation {
+  padding: 0.3rem 0.42rem 0.12rem;
+  border: 1px solid transparent;
+  border-radius: 0.42rem;
+}
+
+.compact-sidebar .asset-operation-selic {
+  background: #e5f0e7;
+  border-color: #a8c5af;
+  color: #214c2d;
+}
+
+.compact-sidebar .asset-operation-bova {
+  background: #f3e2d3;
+  border-color: #d3a17d;
+  color: #6b3d24;
+}
+
+.compact-sidebar .asset-operation h5 {
+  margin: 0 0 0.18rem;
+  font-weight: 700;
+  color: inherit;
+}
+
+.compact-sidebar .asset-operation .control-label {
+  color: inherit;
+}
+
+.compact-sidebar .help-copy {
+  margin: 0 0 0.12rem;
+  font-size: 0.76rem;
+  line-height: 1.22;
+}
+
+.compact-sidebar .shiny-input-container {
+  margin-bottom: 0.25rem;
+}
+
+.compact-sidebar .control-label {
+  margin-bottom: 0.08rem;
+  font-size: 0.78rem;
+  line-height: 1.05;
+}
+
+.compact-sidebar .form-control,
+.compact-sidebar .form-select,
+.compact-sidebar .selectize-input {
+  min-height: 30px;
+  padding: 0.2rem 0.42rem;
+  font-size: 0.82rem;
+  line-height: 1.1;
+}
+
+.compact-sidebar .selectize-input input {
+  font-size: 0.82rem;
+}
+
+.compact-sidebar .input-group-text {
+  min-height: 30px;
+  padding: 0.16rem 0.38rem;
+  font-size: 0.78rem;
+}
+
+.compact-sidebar .btn {
+  padding: 0.3rem 0.48rem;
+  font-size: 0.8rem;
+  line-height: 1.15;
+}
+
+.compact-sidebar hr {
+  margin: 0.32rem 0;
+}
+
+.compact-sidebar #ipca_status {
+  min-height: 0;
+  font-size: 0.74rem;
+  line-height: 1.05;
+}
+
+.bslib-value-box .value-box-value {
+  font-size: clamp(1.05rem, 1.55vw, 1.42rem);
+  line-height: 1.05;
+}
+
+.bslib-value-box {
+  height: 68px !important;
+  min-height: 68px !important;
+  max-height: 68px !important;
+  overflow: hidden;
+}
+
+/* A grade e os cards precisam terminar antes da secao seguinte. Em layouts
+   fillable, o bslib remove automaticamente a margem inferior da grade. */
+.metric-grid {
+  margin-bottom: 1rem !important;
+}
+
+/* O bslib empilha o showcase acima do conteudo quando o card tem menos de
+   300px. Estes indicadores foram desenhados para permanecer em duas colunas. */
+.bslib-value-box.metric-card.showcase-left-center .value-box-grid {
+  grid-template-columns: 2.25rem minmax(0, 1fr) !important;
+  grid-template-rows: 1fr !important;
+  grid-template-areas: "left right" !important;
+}
+
+.bslib-value-box.metric-card.showcase-left-center .value-box-grid .value-box-showcase {
+  grid-area: left !important;
+}
+
+.bslib-value-box.metric-card.showcase-left-center .value-box-grid .value-box-area {
+  grid-area: right !important;
+  min-width: 0;
+}
+
+.bslib-value-box .value-box-area {
+  padding: 0.3rem 0.55rem 0.48rem !important;
+  justify-content: center;
+}
+
+.bslib-value-box .value-box-title {
+  font-size: 0.72rem;
+  line-height: 1.05;
+  margin-bottom: 0.08rem;
+}
+
+.bslib-value-box .value-box-showcase {
+  font-size: 1rem;
+  padding-inline: 0.35rem;
+}
+
+.metric-card.metric-1 {
+  background: #166534 !important;
+  color: #fff !important;
+}
+
+.metric-card.metric-2 {
+  background: #347d4b !important;
+  color: #fff !important;
+}
+
+.metric-card.metric-3 {
+  background: #68a079 !important;
+  color: #fff !important;
+}
+
+.metric-card.metric-4 {
+  background: #a6cbb0 !important;
+  color: #173c24 !important;
+}
+
+.metric-card.metric-5 {
+  background: #deeee2 !important;
+  color: #173c24 !important;
+}
+
+.metric-card .value-box-title,
+.metric-card .value-box-value,
+.metric-card .value-box-showcase {
+  color: inherit !important;
+}
+
+.table-scroll {
+  max-height: clamp(180px, 24vh, 280px);
+  overflow: auto;
+}
+
+.table {
+  font-size: 0.9rem;
+  white-space: nowrap;
+  min-width: 720px;
+}
+
+.card {
+  border: 0;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.08);
+}
+
+.card-header {
+  padding-block: 0.4rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.card-footer {
+  padding-block: 0.3rem;
+  font-size: 0.76rem;
+}
+
+.selic-comparison-card,
+.selic-comparison-card .card-header,
+.selic-comparison-card .card-body,
+.selic-comparison-card .card-footer {
+  background: #eef5f0;
+}
+
+.selic-comparison-card {
+  border: 1px solid #d8e7dc;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.selic-comparison-card .table {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  table-layout: fixed;
+  margin-bottom: 0;
+  white-space: normal;
+  font-size: 0.78rem;
+}
+
+.selic-comparison-card .table th,
+.selic-comparison-card .table td {
+  min-width: 0;
+  padding: 0.3rem 0.38rem;
+  overflow-wrap: anywhere;
+}
+
+.selic-comparison-card .table th:first-child,
+.selic-comparison-card .table td:first-child {
+  width: 58%;
+}
+
+.selic-comparison-card .table td:last-child,
+.selic-comparison-card .table th:last-child {
+  width: 42%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+#wealth_plot {
+  height: clamp(290px, 38vh, 410px) !important;
+}
+
+#composition_plot {
+  height: clamp(320px, 42vh, 440px) !important;
+}
+
+@media (max-width: 640px) {
+  .bslib-page-sidebar > .main,
+  .bslib-sidebar-layout > .main {
+    padding: 0.45rem !important;
+  }
+
+  .bslib-value-box .value-box-value {
+    font-size: 1.02rem;
+  }
+
+  .bslib-value-box .value-box-title {
+    font-size: 0.68rem;
+  }
+
+  .echarts4r.html-widget {
+    height: 250px !important;
+    min-height: 250px !important;
+  }
+
+  #wealth_plot,
+  #composition_plot {
+    height: 250px !important;
+  }
+
+  .card-header {
+    font-size: 0.82rem;
+  }
+
+  .card-footer {
+    font-size: 0.68rem;
+  }
+
+  .table-scroll {
+    max-width: calc(100vw - 1.2rem);
+    max-height: 190px;
+  }
+
+  .table {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .bslib-value-box {
+    height: 62px !important;
+    min-height: 62px !important;
+    max-height: 62px !important;
+  }
+
+  .bslib-value-box .value-box-area {
+    padding: 0.25rem 0.42rem 0.4rem !important;
+  }
+
+  .bslib-value-box .value-box-showcase {
+    font-size: 0.78rem;
+    padding-inline: 0.25rem;
+  }
+
+  .bslib-value-box .value-box-value {
+    font-size: 0.9rem;
+  }
+}

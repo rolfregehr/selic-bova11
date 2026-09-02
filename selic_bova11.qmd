@@ -7,6 +7,11 @@ format:
     css: styles.css
     orientation: rows
     scrolling: false
+    nav-buttons:
+      - text: "Carteira"
+        icon: wallet2
+        href: https://carteira.rolfregehr.com.br/
+        aria-label: "Abrir Minha carteira"
 output-file: index.html
 execute:
   echo: false
@@ -487,11 +492,7 @@ cat(
     "**BOVA11:** Yahoo Finance, ticker `BOVA11.SA`, campo `",
     campo_yahoo,
     "`; retorno calculado pela variação do preço em relação à data-base.  \n",
-    "**Observações carregadas:** SELIC = ", nrow(selic_plot),
-    " | BOVA11 = ", nrow(bova_plot), ".  \n",
-    "**Atualização:** os dados são coletados novamente sempre que este ",
-    "arquivo Quarto é renderizado.  \n",
-    "**Última renderização:** ",
+     "**Última renderização:** ",
     format(Sys.time(), "%d/%m/%Y %H:%M:%S"),
     "."
   )
